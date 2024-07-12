@@ -16,7 +16,6 @@ import com.best.worm.config.SimpleConfigService;
 import java.util.Map;
 import java.util.Optional;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class LocalStoreSequenceService implements StoreSequenceService {
     private String filePath = "D:\\max_sequence.bin";
