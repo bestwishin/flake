@@ -34,4 +34,13 @@ public class Section {
     public void setCurrentValue(long currentValue) {
         this.currentValue = currentValue;
     }
+
+    public void step(int step) {
+        this.currentValue += step;
+    }
+
+    public static int calcSectionId(int uid) {
+        return uid / 100000 + 1;
+    }
+
 }

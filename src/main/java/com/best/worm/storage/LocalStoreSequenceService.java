@@ -14,6 +14,7 @@ import com.best.worm.config.ConfigService;
 import com.best.worm.config.SimpleConfigService;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -34,42 +35,40 @@ public class LocalStoreSequenceService implements StoreSequenceService {
         this.map = ans;
     }
 
-    public boolean canPass(long current, long uid) {
-        int id = getSectionId(uid);
+    public boolean canPass(long current, int uid) {
+        int id = Section.calcSectionId(uid);
         Section section = map.get(id);
         if (section == null) {
             return false;
         }
-        if (current + 1 > section.getCurrentValue()) {
-            long target = section.getCurrentValue() + configService.step();
-            boolean r = save(target, section.getId());
-            if (r) {
-                section.setCurrentValue(target);
-            } else {
-                return false;
-            }
+        if (current + 1 <= section.getCurrentValue()) {
+            return true;
         }
-        return true;
+
+        boolean r = saveToFile(section);
+        if (r) {
+            section.step(configService.step());
+            return true;
+        } 
+        return false;
     }
 
-    public AtomicLong getInitValue(long uid) {
-        int id = getSectionId(uid);
+    public Optional<Long> initValue(int uid) {
+        Optional<Long> op = Optional.empty();
+        int id = Section.calcSectionId(uid);
         Section section = map.get(id);
-        if (section == null) {
-            return null;
+        if (section != null) {
+            op = Optional.ofNullable(section.getInitValue());
         }
-        return new AtomicLong(section.getInitValue());
+        return op;
 
     }
 
-    private int getSectionId(long uid) {
-        return (int) (uid / 100000 + 1);
-    }
 
-    private boolean save(long counter, int id) {
+    private boolean saveToFile(Section section) {
         try {
-            Path tempFile = writeTempSequenceFile(counter);
-            Path permanentFile = Paths.get(filePath + id);
+            Path tempFile = writeTempSequenceFile(section.getCurrentValue() + configService.step());
+            Path permanentFile = Paths.get(filePath + section.getId());
             Files.move(tempFile, permanentFile, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             e.printStackTrace();

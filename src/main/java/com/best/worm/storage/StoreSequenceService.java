@@ -1,10 +1,10 @@
 package com.best.worm.storage;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
 
 public interface StoreSequenceService {
-    boolean canPass(long current, long uid);
+    boolean canPass(long current, int uid);
 
-    AtomicLong getInitValue(long uid);
+    Optional<Long> initValue(int uid);
 
 }
