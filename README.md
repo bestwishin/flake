@@ -1,4 +1,4 @@
-# 序列号生成
+# 递增不连续的序列号
 # 1 单线程模式
 ![flake drawio](https://github.com/user-attachments/assets/a7116832-9d86-4746-ad3e-0e7289c32219)
 ---
